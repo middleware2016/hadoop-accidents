@@ -32,8 +32,15 @@ import java.util.GregorianCalendar;
 
 import static java.util.Calendar.YEAR;
 
+/*
+    Returns the number of lethal accidents for each week in the data set.
+ */
 public class LethalPerWeek extends Configured implements Tool {
 
+    /*
+        Generate tuples <Text "YYYY-weeknum", 1> for lethal accidents per week
+        weeknum is the number of the week in the year (1-52, approximately)
+     */
     public static class LethalWeekMapper
             extends Mapper<Object, Text, Text, IntWritable> {
 
@@ -74,13 +81,14 @@ public class LethalPerWeek extends Configured implements Tool {
         }
     }
 
-
     public int run(String[] args) throws Exception {
         Configuration conf = getConf();
         Job job = Job.getInstance(conf, this.getClass().toString());
 
         job.setJarByClass(LethalPerWeek.class);
         job.setMapperClass(LethalWeekMapper.class);
+
+        // Built-in combiner/reducer by Hadoop, which simply sums the values for each key.
         job.setCombinerClass(IntSumReducer.class);
         job.setReducerClass(IntSumReducer.class);
 

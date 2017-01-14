@@ -25,6 +25,11 @@ import org.apache.hadoop.util.ToolRunner;
 import java.io.IOException;
 import java.io.StringReader;
 
+/*
+    For each "contributing factor" in car accidents (e.g. driver distraction), return:
+    1) The total number of accidents
+    2) Average number of deaths per accident
+ */
 public class ContributingFactors extends Configured implements Tool {
 
     public static class ContributingFactorMapper
@@ -40,7 +45,7 @@ public class ContributingFactors extends Configured implements Tool {
         ) throws IOException, InterruptedException {
 
             try {
-                CSVParser parser = new CSVParser(new StringReader(value.toString()), CSVFormat.DEFAULT);;
+                CSVParser parser = new CSVParser(new StringReader(value.toString()), CSVFormat.DEFAULT);
                 CSVRecord record;
                 try {
                     record = parser.getRecords().get(0);
@@ -52,7 +57,7 @@ public class ContributingFactors extends Configured implements Tool {
 
                 int cf_initial_index = NYPD_Keys.getIndex("CONTRIBUTING FACTOR VEHICLE 1");
                 // iterate over 5 contribution factors
-                for(int i=cf_initial_index; i<cf_initial_index+5; i++) {
+                for(int i = cf_initial_index; i<cf_initial_index+5; i++) {
                     String contribFactor = record.get(i);
                     if (contribFactor.length() == 0) {
                         LOG.info("Empty contributing factor.");

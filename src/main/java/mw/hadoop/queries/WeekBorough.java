@@ -32,6 +32,10 @@ import java.util.GregorianCalendar;
 
 import static java.util.Calendar.YEAR;
 
+/*
+    Return the average number of accidents and average number of lethal accidents per week per borough.
+    An "UNKNOWN" value is used when the borough field is empty.
+ */
 public class WeekBorough  extends Configured implements Tool {
 
 
