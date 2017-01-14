@@ -19,6 +19,7 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
@@ -114,6 +115,13 @@ public class WeekBorough  extends Configured implements Tool {
     public int run(String[] args) throws Exception {
         Configuration conf = getConf();
 
+        GenericOptionsParser optionParser = new GenericOptionsParser(conf, args);
+        String[] remainingArgs = optionParser.getRemainingArgs();
+        if (remainingArgs.length != 2) {
+            System.err.println("Usage: WeekBorough <infile.csv> <out>");
+            System.exit(2);
+        }
+
         Job job = Job.getInstance(conf, this.getClass().toString());
 
         job.setJarByClass(WeekBorough.class);
@@ -125,8 +133,11 @@ public class WeekBorough  extends Configured implements Tool {
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
 
-        FileInputFormat.setInputPaths(job, new Path("/data/NYPD_Motor_Vehicle_Collisions.csv"));
-        FileOutputFormat.setOutputPath(job, new Path("file:///Users/pietro/tmp/hdp/WeekBorough"));
+        Path in = new Path(remainingArgs[0]);
+        Path out = new Path(remainingArgs[1]);
+
+        FileInputFormat.setInputPaths(job, in);
+        FileOutputFormat.setOutputPath(job, out);
 
         return job.waitForCompletion(true) ? 0 : 1;
     }

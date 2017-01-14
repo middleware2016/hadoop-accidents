@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by pietro on 2017-01-14.
+ * Returns the index of the field of the CSV file.
  */
 public class NYPD_Keys {
     static Map<String, Integer> m;
