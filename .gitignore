@@ -89,3 +89,7 @@ gradle-app.setting
 # gradle/wrapper/gradle-wrapper.properties
 
 # End of https://www.gitignore.io/api/intellij,gradle,java
+
+
+### CUSTOM ###
+run.sh
