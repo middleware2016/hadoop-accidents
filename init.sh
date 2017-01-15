@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 UNZIP="unzip"
-PATH=`pwd`
+CURRENT_PATH=`pwd`
 
 #Download data
 curl http://home.deib.polimi.it/guinea/Materiale/Middleware/NYPD_Motor_Vehicle_Collisions.zip -o  data/NYPD_Motor_Vehicle_Collisions.zip
@@ -24,19 +24,19 @@ if [ \$# -lt 1 ]; then
     usage
 fi
 
-rm -rf $PATH/data/output
+rm -rf $CURRENT_PATH/data/output
 
 if [ \$1 == \"runAll\" ]; then
     for i in \$SCRIPTS; do
-         hadoop jar build/libs/hadoop-accidents-1.0-SNAPSHOT.jar mw.hadoop.queries.\$i file:///$PATH/data/NYPD_Motor_Vehicle_Collisions.csv file:///$PATH/data/output/\$i
+         hadoop jar build/libs/hadoop-accidents-1.0-SNAPSHOT.jar mw.hadoop.queries.\$i file:///$CURRENT_PATH/data/NYPD_Motor_Vehicle_Collisions.csv file:///$CURRENT_PATH/data/output/\$i
     done
 else
     for i in \$@; do
-         hadoop jar build/libs/hadoop-accidents-1.0-SNAPSHOT.jar mw.hadoop.queries.\$i file:///$PATH/data/NYPD_Motor_Vehicle_Collisions.csv file:///$PATH/data/output/\$i
+         hadoop jar build/libs/hadoop-accidents-1.0-SNAPSHOT.jar mw.hadoop.queries.\$i file:///$CURRENT_PATH/data/NYPD_Motor_Vehicle_Collisions.csv file:///$CURRENT_PATH/data/output/\$i
     done
 fi
 
 
 " > run.sh
 
-/bin/chmod +x run.sh
+chmod +x run.sh
