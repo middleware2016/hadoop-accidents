@@ -1,6 +1,9 @@
 # hadoop-accidents
 The goal of this project is to infer qualitative data regarding the car accidents in New York City.
 
+## TODO
+- [ ] charts
+
 ## Input file
 
 The input dataset can be downloaded from [here](http://home.deib.polimi.it/guinea/Materiale/Middleware/index.html).
@@ -19,6 +22,7 @@ Execute `run.sh` passing as argument `runAll` to run all queries or you can sele
 * ContributingFactors
 * LethalPerWeek
 * WeekBorough
+
 for example `./run.sh LethalPerWeek WeekBorough`.
 
 ## Manual way    
