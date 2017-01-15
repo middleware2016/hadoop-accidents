@@ -61,8 +61,16 @@ public class LethalPerWeek extends Configured implements Tool {
                 return;
             }
 
+            //skip header
+            if(key.toString().equals("0"))
+                return;
+
             try {
                 String killedStr = record.get(NYPD_Keys.getIndex("NUMBER OF PERSONS KILLED"));
+                //empty string became 0 killed
+                if(killedStr.equals(""))
+                    killedStr = "0";
+
                 int killed = Integer.parseInt(killedStr);
 
                 if (killed > 0) {
