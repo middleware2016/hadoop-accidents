@@ -1,9 +1,5 @@
 package mw.hadoop.queries;
 
-/**
- * Created by pietro on 2017-01-14.
- */
-
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -30,8 +26,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-
-import static java.util.Calendar.YEAR;
 
 /*
     Return the average number of accidents and average number of lethal accidents per week per borough.
@@ -75,7 +69,7 @@ public class WeekBorough  extends Configured implements Tool {
                     LOG.info("Unknown borough.");
                     borough = "UNKNOWN";
                 }
-                String newkey = String.format("%d-%d-%s", cal.get(YEAR), cal.get(Calendar.WEEK_OF_YEAR), borough);
+                String newkey = String.format("%d-%02d-%s", cal.getWeekYear(), cal.get(Calendar.WEEK_OF_YEAR), borough);
 
                 int killed = Integer.parseInt(record.get(NYPD_Keys.getIndex("NUMBER OF PERSONS KILLED")));
                 boolean lethal = (killed > 0);

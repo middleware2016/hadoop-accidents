@@ -1,9 +1,5 @@
 package mw.hadoop.queries;
 
-/**
- * Created by pietro on 2017-01-14.
- */
-
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -30,8 +26,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-
-import static java.util.Calendar.YEAR;
 
 /*
     Returns the number of lethal accidents for each week in the data set.
@@ -79,7 +73,7 @@ public class LethalPerWeek extends Configured implements Tool {
                     Date date = formatter.parse(dateStr);
                     Calendar cal = new GregorianCalendar();
                     cal.setTime(date);
-                    String newkey = String.format("%d-%d", cal.get(YEAR), cal.get(Calendar.WEEK_OF_YEAR));
+                    String newkey = String.format("%d-%02d", cal.getWeekYear(), cal.get(Calendar.WEEK_OF_YEAR));
 
                     context.write(new Text(newkey), one);
                 }
