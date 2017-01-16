@@ -45,6 +45,10 @@ public class LethalPerWeek extends Configured implements Tool {
         public void map(Object key, Text value, Context context
         ) throws IOException, InterruptedException {
 
+            //skip header
+            if(key.toString().equals("0"))
+                return;
+
             CSVParser parser = new CSVParser(new StringReader(value.toString()), CSVFormat.DEFAULT);
             CSVRecord record;
             try {
@@ -54,10 +58,6 @@ public class LethalPerWeek extends Configured implements Tool {
                 LOG.warn("CSV record corrupted.");
                 return;
             }
-
-            //skip header
-            if(key.toString().equals("0"))
-                return;
 
             try {
                 String killedStr = record.get(NYPD_Keys.getIndex("NUMBER OF PERSONS KILLED"));

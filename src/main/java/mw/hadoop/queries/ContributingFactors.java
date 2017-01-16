@@ -41,6 +41,10 @@ public class ContributingFactors extends Configured implements Tool {
         public void map(Object key, Text value, Context context
         ) throws IOException, InterruptedException {
 
+            //skip header
+            if(key.toString().equals("0"))
+                return;
+
             try {
                 CSVParser parser = new CSVParser(new StringReader(value.toString()), CSVFormat.DEFAULT);
                 CSVRecord record;
