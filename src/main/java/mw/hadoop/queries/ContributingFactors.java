@@ -1,6 +1,5 @@
 package mw.hadoop.queries;
 
-import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.logging.Log;
@@ -46,31 +45,33 @@ public class ContributingFactors extends Configured implements Tool {
                 return;
 
             try {
-                CSVParser parser = new CSVParser(new StringReader(value.toString()), CSVFormat.DEFAULT);
+                CSVParser parser = new CSVParser(new StringReader(value.toString()), NYPD_Keys.csvFormat);
                 CSVRecord record;
                 try {
                     record = parser.getRecords().get(0);
+                    if(!record.isConsistent()) { // check if CSV record matches with header
+                        throw new IOException();
+                    }
                 } catch(IOException e) {
                     // CSV record is corrupted. Continuing.
-                    LOG.warn("CSV record corrupted.");
+                    LOG.warn(String.format("Row %s: CSV record corrupted", key.toString()));
                     return;
                 }
 
-                int cf_initial_index = NYPD_Keys.getIndex("CONTRIBUTING FACTOR VEHICLE 1");
                 // iterate over 5 contribution factors
-                for(int i = cf_initial_index; i<cf_initial_index+5; i++) {
-                    String contribFactor = record.get(i);
+                for(int i = 1; i <= 5; i++) {
+                    String contribFactor = record.get(String.format("CONTRIBUTING FACTOR VEHICLE %d", i));
                     if (contribFactor.length() == 0) {
                         LOG.info("Empty contributing factor.");
                         continue;
                     }
 
-                    int deaths = Integer.parseInt(record.get(NYPD_Keys.getIndex("NUMBER OF PERSONS KILLED")));
+                    int deaths = Integer.parseInt(record.get("NUMBER OF PERSONS KILLED"));
                     context.write(new Text(contribFactor), new IntWritable(deaths));
 
                 }
             } catch(NumberFormatException | ArrayIndexOutOfBoundsException e) {
-                LOG.warn("Parsing error", e);
+                LOG.warn(String.format("Row %s: %s", key.toString(), e.getMessage()));
             }
 
         }

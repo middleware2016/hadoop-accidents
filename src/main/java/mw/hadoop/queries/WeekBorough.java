@@ -1,6 +1,5 @@
 package mw.hadoop.queries;
 
-import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.logging.Log;
@@ -51,36 +50,38 @@ public class WeekBorough  extends Configured implements Tool {
                 return;
 
             try {
-                CSVParser parser = new CSVParser(new StringReader(value.toString()), CSVFormat.DEFAULT);
+                CSVParser parser = new CSVParser(new StringReader(value.toString()), NYPD_Keys.csvFormat);
                 CSVRecord record;
                 try {
                     record = parser.getRecords().get(0);
+                    if(!record.isConsistent()) { // check if CSV record matches with header
+                        throw new IOException();
+                    }
                 } catch(IOException e) {
                     // CSV record is corrupted. Continuing.
-                    LOG.warn("CSV record corrupted.");
+                    LOG.warn(String.format("Row %s: CSV record corrupted", key.toString()));
                     return;
                 }
 
                 SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
-                Date date = formatter.parse(record.get(NYPD_Keys.getIndex("DATE")));
+                Date date = formatter.parse(record.get("DATE"));
                 Calendar cal = new GregorianCalendar();
                 cal.setTime(date);
 
-                String borough = record.get(NYPD_Keys.getIndex("BOROUGH"));
+                String borough = record.get("BOROUGH");
                 if(borough.length() == 0) {
                     // Default value when the field is empty
-                    LOG.info("Unknown borough.");
                     borough = "UNKNOWN";
                 }
                 String newkey = String.format("%d-%02d-%s", cal.getWeekYear(), cal.get(Calendar.WEEK_OF_YEAR), borough);
 
-                int killed = Integer.parseInt(record.get(NYPD_Keys.getIndex("NUMBER OF PERSONS KILLED")));
+                int killed = Integer.parseInt(record.get("NUMBER OF PERSONS KILLED"));
                 boolean lethal = (killed > 0);
 
                 context.write(new Text(newkey), new BooleanWritable(lethal));
 
             } catch(NumberFormatException | ParseException e) {
-                LOG.warn("Parsing error", e);
+                LOG.warn(String.format("Row %s: %s", key.toString(), e.getMessage()));
             }
 
         }

@@ -1,6 +1,5 @@
 package mw.hadoop.queries;
 
-import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.logging.Log;
@@ -49,18 +48,21 @@ public class LethalPerWeek extends Configured implements Tool {
             if(key.toString().equals("0"))
                 return;
 
-            CSVParser parser = new CSVParser(new StringReader(value.toString()), CSVFormat.DEFAULT);
+            CSVParser parser = new CSVParser(new StringReader(value.toString()), NYPD_Keys.csvFormat);
             CSVRecord record;
             try {
                 record = parser.getRecords().get(0);
+                if(!record.isConsistent()) { // check if CSV record matches with header
+                    throw new IOException();
+                }
             } catch (IOException e) {
                 // CSV record is corrupted. Continuing.
-                LOG.warn("CSV record corrupted.");
+                LOG.warn(String.format("Row %s: CSV record corrupted", key.toString()));
                 return;
             }
 
             try {
-                String killedStr = record.get(NYPD_Keys.getIndex("NUMBER OF PERSONS KILLED"));
+                String killedStr = record.get("NUMBER OF PERSONS KILLED");
                 //empty string became 0 killed
                 if(killedStr.equals(""))
                     killedStr = "0";
@@ -69,7 +71,7 @@ public class LethalPerWeek extends Configured implements Tool {
 
                 if (killed > 0) {
                     SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
-                    String dateStr = record.get(NYPD_Keys.getIndex("DATE"));
+                    String dateStr = record.get("DATE");
                     Date date = formatter.parse(dateStr);
                     Calendar cal = new GregorianCalendar();
                     cal.setTime(date);
@@ -78,7 +80,7 @@ public class LethalPerWeek extends Configured implements Tool {
                     context.write(new Text(newkey), one);
                 }
             } catch (NumberFormatException | ParseException e) {
-                LOG.warn("Parsing error", e);
+                LOG.warn(String.format("Row %s: %s", key.toString(), e.getMessage()));
             }
 
         }
