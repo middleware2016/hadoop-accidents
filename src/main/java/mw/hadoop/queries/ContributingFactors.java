@@ -37,6 +37,7 @@ public class ContributingFactors extends Configured implements Tool {
         /*
             Generates tuples <Text ContributionFactor, IntWritable Deaths>
          */
+        @Override
         public void map(Object key, Text value, Context context
         ) throws IOException, InterruptedException {
 
@@ -58,6 +59,9 @@ public class ContributingFactors extends Configured implements Tool {
                     return;
                 }
 
+
+                int deaths = Integer.parseInt(record.get("NUMBER OF PERSONS KILLED"));
+
                 // iterate over 5 contribution factors
                 for(int i = 1; i <= 5; i++) {
                     String contribFactor = record.get(String.format("CONTRIBUTING FACTOR VEHICLE %d", i));
@@ -66,7 +70,6 @@ public class ContributingFactors extends Configured implements Tool {
                         continue;
                     }
 
-                    int deaths = Integer.parseInt(record.get("NUMBER OF PERSONS KILLED"));
                     context.write(new Text(contribFactor), new IntWritable(deaths));
 
                 }
@@ -84,6 +87,7 @@ public class ContributingFactors extends Configured implements Tool {
             extends Reducer<Text,IntWritable,Text,Text> {
         private IntWritable result = new IntWritable();
 
+        @Override
         public void reduce(Text key, Iterable<IntWritable> values,
                            Context context
         ) throws IOException, InterruptedException {
@@ -100,6 +104,7 @@ public class ContributingFactors extends Configured implements Tool {
         }
     }
 
+    @Override
     public int run(String[] args) throws Exception {
         Configuration conf = getConf();
 
