@@ -41,6 +41,17 @@ public class LethalPerWeek extends Configured implements Tool {
         private final static Log LOG = LogFactory.getLog(LethalWeekMapper.class);
         private final static IntWritable one = new IntWritable(1);
 
+        //Data management utility
+        private SimpleDateFormat formatter;
+        private Calendar cal;
+
+        @Override
+        public void setup(Context context){
+            formatter = new SimpleDateFormat("MM/dd/yyyy");
+            cal = new GregorianCalendar();
+        }
+
+        @Override
         public void map(Object key, Text value, Context context
         ) throws IOException, InterruptedException {
 
@@ -70,10 +81,8 @@ public class LethalPerWeek extends Configured implements Tool {
                 int killed = Integer.parseInt(killedStr);
 
                 if (killed > 0) {
-                    SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
                     String dateStr = record.get("DATE");
                     Date date = formatter.parse(dateStr);
-                    Calendar cal = new GregorianCalendar();
                     cal.setTime(date);
                     String newkey = String.format("%d-%02d", cal.getWeekYear(), cal.get(Calendar.WEEK_OF_YEAR));
 
@@ -86,6 +95,7 @@ public class LethalPerWeek extends Configured implements Tool {
         }
     }
 
+    @Override
     public int run(String[] args) throws Exception {
         Configuration conf = getConf();
 
