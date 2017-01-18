@@ -39,9 +39,20 @@ public class WeekBorough  extends Configured implements Tool {
 
         private static final Log LOG = LogFactory.getLog(WeekBoroughMapper.class);
 
+        //Data management utility
+        private SimpleDateFormat formatter;
+        private Calendar cal;
+
+        @Override
+        public void setup(Context context){
+            formatter = new SimpleDateFormat("MM/dd/yyyy");
+            cal = new GregorianCalendar();
+        }
+
         /*
             Generates tuples <Text "YEAR-WEEK-BOROUGH", BooleanWritable is_lethal>
          */
+        @Override
         public void map(Object key, Text value, Context context
         ) throws IOException, InterruptedException {
 
@@ -63,9 +74,7 @@ public class WeekBorough  extends Configured implements Tool {
                     return;
                 }
 
-                SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
                 Date date = formatter.parse(record.get("DATE"));
-                Calendar cal = new GregorianCalendar();
                 cal.setTime(date);
 
                 String borough = record.get("BOROUGH");
@@ -93,9 +102,11 @@ public class WeekBorough  extends Configured implements Tool {
     public static class WeekBoroughReducer
             extends Reducer<Text,BooleanWritable,Text,Text> {
 
+        @Override
         public void reduce(Text key, Iterable<BooleanWritable> values,
                            Context context
         ) throws IOException, InterruptedException {
+
             int numLethalAccidents = 0;
             int numAccidents = 0;
             for (BooleanWritable val : values) {
