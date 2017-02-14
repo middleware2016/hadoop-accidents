@@ -81,7 +81,7 @@ public class ContributingFactors extends Configured implements Tool {
     }
 
     /*
-        Returns tuples <Text ContributingFactor, "avgDeaths: %f; numAccidents: %d">
+        Returns tuples <Text ContributingFactor, Number of deaths per accident, Number of accidents>
      */
     public static class ContributingFactorReducer
             extends Reducer<Text,IntWritable,Text,Text> {
@@ -99,7 +99,7 @@ public class ContributingFactors extends Configured implements Tool {
             }
             float avgDeaths = (float)deaths / numAccidents;
 
-            String res = String.format("avgDeaths: %f; numAccidents: %d", avgDeaths, numAccidents);
+            String res = String.format("%.8f\t%d", avgDeaths, numAccidents);
             context.write(key, new Text(res));
         }
     }

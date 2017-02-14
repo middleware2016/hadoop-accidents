@@ -97,7 +97,7 @@ public class WeekBorough  extends Configured implements Tool {
     }
 
     /*
-        Returns tuples <Text "YEAR-WEEK-BOROUGH", "accidents: %f; lethalAccidents: %f">
+        Returns tuples <Text "YEAR-WEEK-BOROUGH", Number of accidents, Number of lethal accidents>
      */
     public static class WeekBoroughReducer
             extends Reducer<Text,BooleanWritable,Text,Text> {
@@ -116,7 +116,7 @@ public class WeekBorough  extends Configured implements Tool {
                 }
             }
 
-            String res = String.format("accidents: %d; lethalAccidents: %d", numAccidents, numLethalAccidents);
+            String res = String.format("%d\t%d", numAccidents, numLethalAccidents);
             context.write(key, new Text(res));
         }
     }
