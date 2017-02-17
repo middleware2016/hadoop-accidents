@@ -37,4 +37,4 @@ try:
     file = open(os.path.dirname(os.path.abspath(__file__))+"/../data/output/LethalPerWeek/part-r-00000", "r")
     plot(file)
 except IOError as e:
-    print "LethalPerWeek not generated"
+    print("LethalPerWeek not generated")
