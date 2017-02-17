@@ -1,7 +1,3 @@
-"""
-Demo of spines using custom bounds to limit the extent of the spine.
-"""
-import numpy as np
 import matplotlib.pyplot as plt
 import os
 
