@@ -20,8 +20,8 @@ def plot( file ):
             x.append(i)
             x2.append(i+width)
             i+=1
-            y.append(tmp[1].replace(',', '.'))
-            y2.append(tmp[2].replace(',', '.'))
+            y.append(float(tmp[1].replace(',', '.')))
+            y2.append(float(tmp[2].replace(',', '.')))
 
     #X and Y are swapped
     fig, ax1 = plt.subplots()
@@ -45,4 +45,4 @@ try:
     file = open(os.path.dirname(os.path.abspath(__file__))+"/../data/output/ContributingFactors/part-r-00000", "r")
     plot(file)
 except IOError as e:
-    print "LethalPerWeek not generated"
+    print("LethalPerWeek not generated")
