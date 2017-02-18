@@ -36,7 +36,7 @@ def picked(event):
     annotations.append(ann)
     plt.draw()
 
-def plot( file ):
+def processFile(file):
     with file as f:
         for row in f:
             tmp = row.split("\t")
@@ -45,10 +45,11 @@ def plot( file ):
                 deaths.append(float(tmp[1].replace(',', '.')))
                 accidents.append(float(tmp[2].replace(',', '.')))
 
+def plot():
     fig, ax = plt.subplots()
     ax.scatter(accidents, deaths, c="b", alpha=0.5,
             label="Cause", picker=True)
-    
+
     ax.semilogx()
     ax.set_ylim(ymin=-0.001)
     plt.xlabel("Number of accidents")
@@ -64,6 +65,7 @@ def plot( file ):
 
 try:
     file = open(os.path.dirname(os.path.abspath(__file__))+"/../data/output/ContributingFactors/part-r-00000", "r")
-    plot(file)
+    processFile(file)
+    plot()
 except IOError as e:
     print("LethalPerWeek not generated")

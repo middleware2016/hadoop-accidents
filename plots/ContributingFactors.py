@@ -1,14 +1,14 @@
 import matplotlib.pyplot as plt
 import os
 
-def plot( file ):
-    x = []      # [1, 2, ..., n]: index of contributing factors
-    x2 = []     # x + width
-    xlabels = []# contributing factors name
-    y = []      # accidents
-    y2 = []     # average number of deaths
-    width = 0.35
+x = []      # [1, 2, ..., n]: index of contributing factors
+x2 = []     # x + width
+xlabels = []# contributing factors name
+y = []      # accidents
+y2 = []     # average number of deaths
+width = 0.35
 
+def processFile(file):
     with file as f:
         for i, row in enumerate(f):
             tmp = row.split("\t")
@@ -19,6 +19,7 @@ def plot( file ):
                 y.append(float(tmp[1].replace(',', '.')))
                 y2.append(float(tmp[2].replace(',', '.')))
 
+def plot():
     #X and Y are swapped
     fig, ax1 = plt.subplots()
     rects1 = ax1.barh(x, y, width, color='r')
@@ -39,6 +40,7 @@ def plot( file ):
 
 try:
     file = open(os.path.dirname(os.path.abspath(__file__))+"/../data/output/ContributingFactors/part-r-00000", "r")
-    plot(file)
+    processFile(file)
+    plot()
 except IOError as e:
     print("LethalPerWeek not generated")
