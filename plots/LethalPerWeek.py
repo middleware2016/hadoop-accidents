@@ -6,9 +6,9 @@ def plot( file ):
     xlabels = []
     y = []
 
-    with file as row:
-        for i, value in enumerate(row):
-            tmp = value.split("\t")
+    with file as f:
+        for i, row in enumerate(f):
+            tmp = row.split("\t")
             if( len(tmp) == 2):
                 xlabels.append(tmp[0])
                 x.append(i)

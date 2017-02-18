@@ -9,9 +9,9 @@ def plot( file ):
     y2 = []     # average number of deaths
     width = 0.35
 
-    with file as row:
-        for i, value in enumerate(row):
-            tmp = value.split("\t")
+    with file as f:
+        for i, row in enumerate(f):
+            tmp = row.split("\t")
             if( len(tmp) == 3):
                 xlabels.append(tmp[0])
                 x.append(i)
@@ -33,7 +33,7 @@ def plot( file ):
     ax1.set_yticks(x)
     ax1.set_yticklabels(xlabels)
 
-    fig.canvas.set_window_title('Contributing Factors')
+    fig.canvas.set_window_title('Contributing Factors for accidents')
 
     plt.show()
 

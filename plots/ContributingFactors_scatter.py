@@ -27,7 +27,6 @@ def picked(event):
 
     # The tooltip will be displayed in the position of the first selected point
     i = indexes[0]
-    print(xlabels[i]) # prints to the console the contributing factor associated with the point
     ann = plt.annotate(
         desc,
         xy=(accidents[i], deaths[i]), xytext=(-20, 20),
@@ -38,9 +37,9 @@ def picked(event):
     plt.draw()
 
 def plot( file ):
-    with file as row:
-        for i, value in enumerate(row):
-            tmp = value.split("\t")
+    with file as f:
+        for row in f:
+            tmp = row.split("\t")
             if( len(tmp) == 3):
                 xlabels.append(tmp[0])
                 deaths.append(float(tmp[1].replace(',', '.')))
@@ -49,14 +48,18 @@ def plot( file ):
     fig, ax = plt.subplots()
     ax.scatter(accidents, deaths, c="b", alpha=0.5,
             label="Cause", picker=True)
+    
     ax.semilogx()
-
     ax.set_ylim(ymin=-0.001)
-    plt.xlabel("Num. accidents")
-    plt.ylabel("Avg. deaths")
+    plt.xlabel("Number of accidents")
+    plt.ylabel("Deaths / accidents")
+
+    fig.canvas.set_window_title('Contributing Factors for accidents')
+    plt.title('Contributing Factors for accidents')
     plt.grid(True)
 
     fig.canvas.mpl_connect('pick_event', picked)
+
     plt.show()
 
 try:
