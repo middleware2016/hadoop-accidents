@@ -1,19 +1,41 @@
 import matplotlib.pyplot as plt
 import os
-import AnnoteFinder
 
 xlabels = []# contributing factors name
 accidents = []      # accidents
 deaths = []     # average number of deaths
 width = 0.35
 
-# TODO tooltips!
+annotations = []
+
+def clearAnnotations():
+    """Delete all the existing tooltips"""
+
+    global annotations
+    for ann in annotations:
+        ann.remove()
+    annotations = []
+
 def picked(event):
-    index = event.ind
-    print('--------------')
-    print(index)
-    for i in index:
-        print(xlabels[i]) # prints to the console the contributing factor associated with the point
+    """Display the tooltip for the selected point(s)"""
+
+    clearAnnotations()
+
+    indexes = event.ind
+    # If multiple points are picked: join the labels
+    desc = "\n".join([xlabels[i] for i in indexes])
+
+    # The tooltip will be displayed in the position of the first selected point
+    i = indexes[0]
+    print(xlabels[i]) # prints to the console the contributing factor associated with the point
+    ann = plt.annotate(
+        desc,
+        xy=(accidents[i], deaths[i]), xytext=(-20, 20),
+        textcoords='offset points', ha='left', va='bottom',
+        bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
+        arrowprops=dict(arrowstyle = '->', connectionstyle='arc3,rad=0'))
+    annotations.append(ann)
+    plt.draw()
 
 def plot( file ):
     with file as row:
@@ -33,9 +55,9 @@ def plot( file ):
     plt.xlabel("Num. accidents")
     plt.ylabel("Avg. deaths")
     plt.grid(True)
-    fig.canvas.mpl_connect('pick_event', picked) # "button_press_event"
-    plt.show()
 
+    fig.canvas.mpl_connect('pick_event', picked)
+    plt.show()
 
 try:
     file = open(os.path.dirname(os.path.abspath(__file__))+"/../data/output/ContributingFactors/part-r-00000", "r")
