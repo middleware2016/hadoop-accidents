@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import os
+import numpy as np
 
 x = []
 xlabels = []
@@ -18,7 +19,15 @@ def plot():
     fig, ax = plt.subplots()
     ax.plot(x, y, 'k-', marker='o', markerfacecolor='r')
     #ax.set_xticks(x) #they are too many
-    ax.set_xticklabels(xlabels)
+
+    numOfLabels = 5
+    subxLabels = []
+    subx = np.linspace(0, len(x)-1, num=numOfLabels)
+    for value in subx:
+        subxLabels.append(xlabels[int(value)])
+    ax.set_xticks(subx)
+    ax.set_xticklabels(subxLabels)
+
 
     fig.canvas.set_window_title('Lethal per Week')
     plt.title('Lethal per Week')
