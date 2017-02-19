@@ -39,8 +39,7 @@ def plot():
     x = np.arange(len(xlabels))
     values = [[x[1] for x in data[borough]] for borough in data.keys()]
     stack_coll = ax.stackplot(x, values)
-    proxy_rects = [Rectangle((0, 0), 1, 1, fc=pc.get_facecolor()[0]) for pc in stack_coll]
-    ax.legend(proxy_rects, data.keys())
+
     ax.set_xticks(subx)
     ax.set_xticklabels(subxLabels)
 
@@ -55,15 +54,20 @@ def plot():
     x = np.arange(len(xlabels))
     values = [[x[2] for x in data[borough]] for borough in data.keys()]
     stack_coll = ax.stackplot(x, values)
-    proxy_rects = [Rectangle((0, 0), 1, 1, fc=pc.get_facecolor()[0]) for pc in stack_coll]
-    ax.legend(proxy_rects, data.keys())
     ax.set_xticks(subx)
     ax.set_xticklabels(subxLabels)
+
+    # Legend
+    proxy_rects = [Rectangle((0, 0), 1, 1, fc=pc.get_facecolor()[0]) for pc in stack_coll]
+    ax.legend(proxy_rects, data.keys(), loc='lower center', bbox_to_anchor=(0.5, -0.5), ncol=6)
 
     plt.title('Lethal accidents per Week')
     plt.ylabel('Lethal accidents')
     plt.xlabel('Week')
-    
+
+    plt.tight_layout()
+    fig.subplots_adjust(bottom=0.2)
+
     plt.show()
 
 try:
