@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import os
 import numpy as np
+from matplotlib.patches import Rectangle
 
 def toList(dictionary, key):
     ret = []
@@ -34,13 +35,19 @@ def plot( file ):
 
     ax = plt.subplot(2, 1, 1)
     keys = data.keys()
+    labels = []
+    values = []
     for value in keys:
         ytmp = toList(data, value)
-        ax.plot(np.arange(len(ytmp)), ytmp, 'o-')
+        labels.append(value)
+        values.append(ytmp)
 
+    x = np.arange(len(data[keys[0]].keys()))
+    stack_coll = ax.stackplot(x, values)
+    proxy_rects = [Rectangle((0, 0), 1, 1, fc=pc.get_facecolor()[0]) for pc in stack_coll]
+    ax.legend(proxy_rects, labels)
     xlabels = data[keys[0]].keys()
 
-    #ax.set_xticks(x) #they are too many
     ax.set_xticklabels(xlabels)
     plt.title('Number of Accidents per Week')
     plt.ylabel('Accidents')
@@ -48,13 +55,19 @@ def plot( file ):
 
     ax = plt.subplot(2, 1, 2)
     keys = data2.keys()
+    labels = []
+    values = []
     for value in keys:
         ytmp = toList(data2, value)
-        ax.plot(np.arange(len(ytmp)), ytmp, 'o-')
+        labels.append(value)
+        values.append(ytmp)
 
+    x = np.arange(len(data[keys[0]].keys()))
+    stack_coll = ax.stackplot(x, values)
+    proxy_rects = [Rectangle((0, 0), 1, 1, fc=pc.get_facecolor()[0]) for pc in stack_coll]
+    ax.legend(proxy_rects, labels)
     xlabels = data2[keys[0]].keys()
 
-    #ax.set_xticks(x) #they are too many
     ax.set_xticklabels(xlabels)
     plt.title('Lethal per Week')
     plt.ylabel('Lethal')
