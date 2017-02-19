@@ -82,7 +82,7 @@ public class WeekBorough  extends Configured implements Tool {
                     // Default value when the field is empty
                     borough = "UNKNOWN";
                 }
-                String newkey = String.format("%d-%02d-%s", cal.getWeekYear(), cal.get(Calendar.WEEK_OF_YEAR), borough);
+                String newkey = String.format("%d-%02d_%s", cal.getWeekYear(), cal.get(Calendar.WEEK_OF_YEAR), borough);
 
                 int killed = Integer.parseInt(record.get("NUMBER OF PERSONS KILLED"));
                 boolean lethal = (killed > 0);
