@@ -27,7 +27,7 @@ def plot():
     #ax.set_xticks(x) #they are too many
 
     # Only generate a fixed number of ticks
-    subx, subxLabels = genLabelTicks(5, xlabels)
+    subx, subxLabels = genLabelTicks(10, xlabels)
     ax.set_xticks(subx)
     ax.set_xticklabels(subxLabels)
 

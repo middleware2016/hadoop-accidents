@@ -29,7 +29,7 @@ def plot():
 
     # Common part
     fig, ax = plt.subplots()
-    subx, subxLabels = genLabelTicks(5, xlabels)
+    subx, subxLabels = genLabelTicks(10, xlabels)
     fig.canvas.set_window_title('WeekBorough')
 
 
