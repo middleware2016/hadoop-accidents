@@ -36,6 +36,7 @@ public class ContributingFactors extends Configured implements Tool {
 
         /*
             Generates tuples <Text ContributionFactor, IntWritable Deaths>
+            Each row corresponds to a single accident.
          */
         @Override
         public void map(Object key, Text value, Context context
@@ -81,7 +82,7 @@ public class ContributingFactors extends Configured implements Tool {
     }
 
     /*
-        Returns tuples <Text ContributingFactor, Number of deaths per accident, Number of accidents>
+        Returns tuples <Text ContributingFactor, N. deaths per accident, N. accidents, Percentage of lethal accidents>
      */
     public static class ContributingFactorReducer
             extends Reducer<Text,IntWritable,Text,Text> {
@@ -93,13 +94,17 @@ public class ContributingFactors extends Configured implements Tool {
         ) throws IOException, InterruptedException {
             int deaths = 0;
             int numAccidents = 0;
-            for (IntWritable val : values) {
-                deaths += val.get();
+            int lethalAccidents = 0;
+            for (IntWritable currentDeaths : values) {
+                deaths += currentDeaths.get();
                 numAccidents++;
+                if(currentDeaths.get()>0)
+                    lethalAccidents++;
             }
             float avgDeaths = (float)deaths / numAccidents;
+            float avgLethal = (float)lethalAccidents / numAccidents;
 
-            String res = String.format("%.8f\t%d", avgDeaths, numAccidents);
+            String res = String.format("%.8f\t%d\t%f", avgDeaths, numAccidents, avgLethal);
             context.write(key, new Text(res));
         }
     }

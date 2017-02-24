@@ -1,9 +1,10 @@
 import matplotlib.pyplot as plt
 import os
+from matplotlib.ticker import FuncFormatter
 
-xlabels = []# contributing factors name
+xlabels = []        # contributing factors name
 accidents = []      # accidents
-deaths = []     # average number of deaths
+percLethal = []     # percentage of lethal accidents
 width = 0.35
 
 annotations = []
@@ -29,7 +30,7 @@ def picked(event):
     i = indexes[0]
     ann = plt.annotate(
         desc,
-        xy=(accidents[i], deaths[i]), xytext=(-20, 20),
+        xy=(accidents[i], percLethal[i]), xytext=(-20, 20),
         textcoords='offset points', ha='left', va='bottom',
         bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
         arrowprops=dict(arrowstyle = '->', connectionstyle='arc3,rad=0'))
@@ -40,20 +41,23 @@ def processFile(file):
     with file as f:
         for row in f:
             tmp = row.split("\t")
-            if( len(tmp) == 3):
+            if( len(tmp) == 4):
                 xlabels.append(tmp[0])
-                deaths.append(float(tmp[1].replace(',', '.')))
-                accidents.append(float(tmp[2].replace(',', '.')))
+                accidents.append(int(tmp[2]))
+                percLethal.append(float(tmp[3].replace(',', '.')))
 
 def plot():
     fig, ax = plt.subplots()
-    ax.scatter(accidents, deaths, c="b", alpha=0.5,
+    ax.scatter(accidents, percLethal, c="b", alpha=0.5,
             label="Cause", picker=True)
 
     ax.semilogx()
     ax.set_ylim(ymin=-0.001)
-    plt.xlabel("Number of accidents")
-    plt.ylabel("Deaths / accidents")
+    plt.xlabel('Number of accidents')
+    plt.ylabel('% of lethal accidents')
+
+    percentageFormatter = FuncFormatter(lambda y, pos: '{:.2f}%'.format(y*100))
+    ax.yaxis.set_major_formatter(percentageFormatter)
 
     fig.canvas.set_window_title('Contributing Factors for accidents')
     plt.title('Contributing Factors for accidents')
