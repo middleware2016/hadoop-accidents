@@ -1,5 +1,3 @@
-package mw.hadoop.queries;
-
 import org.apache.commons.csv.CSVFormat;
 
 /**

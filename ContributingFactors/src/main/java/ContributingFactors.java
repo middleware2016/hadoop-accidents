@@ -1,5 +1,3 @@
-package mw.hadoop.queries;
-
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.logging.Log;
@@ -7,7 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.BooleanWritable;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -20,37 +18,23 @@ import org.apache.hadoop.util.ToolRunner;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 
 /*
-    Return the average number of accidents and average number of lethal accidents per week per borough.
-    An "UNKNOWN" value is used when the borough field is empty.
+    For each "contributing factor" in car accidents (e.g. driver distraction), return:
+    1) The total number of accidents
+    2) Average number of deaths per accident
  */
-public class WeekBorough  extends Configured implements Tool {
+public class ContributingFactors extends Configured implements Tool {
 
+    public static class ContributingFactorMapper
+            extends Mapper<Object, Text, Text, IntWritable> {
 
-    public static class WeekBoroughMapper
-            extends Mapper<Object, Text, Text, BooleanWritable> {
-
-
-        private static final Log LOG = LogFactory.getLog(WeekBoroughMapper.class);
-
-        //Data management utility
-        private SimpleDateFormat formatter;
-        private Calendar cal;
-
-        @Override
-        public void setup(Context context){
-            formatter = new SimpleDateFormat("MM/dd/yyyy");
-            cal = new GregorianCalendar();
-        }
+        private final static Log LOG = LogFactory.getLog(ContributingFactorMapper.class);
+        private final static IntWritable one = new IntWritable(1);
 
         /*
-            Generates tuples <Text "YEAR-WEEK-BOROUGH", BooleanWritable is_lethal>
+            Generates tuples <Text ContributionFactor, IntWritable Deaths>
+            Each row corresponds to a single accident.
          */
         @Override
         public void map(Object key, Text value, Context context
@@ -74,22 +58,21 @@ public class WeekBorough  extends Configured implements Tool {
                     return;
                 }
 
-                Date date = formatter.parse(record.get("DATE"));
-                cal.setTime(date);
 
-                String borough = record.get("BOROUGH");
-                if(borough.length() == 0) {
-                    // Default value when the field is empty
-                    borough = "UNKNOWN";
+                int deaths = Integer.parseInt(record.get("NUMBER OF PERSONS KILLED"));
+
+                // iterate over 5 contribution factors
+                for(int i = 1; i <= 5; i++) {
+                    String contribFactor = record.get(String.format("CONTRIBUTING FACTOR VEHICLE %d", i));
+                    if (contribFactor.length() == 0) {
+                        LOG.info("Empty contributing factor.");
+                        continue;
+                    }
+
+                    context.write(new Text(contribFactor), new IntWritable(deaths));
+
                 }
-                String newkey = String.format("%d-%02d_%s", cal.getWeekYear(), cal.get(Calendar.WEEK_OF_YEAR), borough);
-
-                int killed = Integer.parseInt(record.get("NUMBER OF PERSONS KILLED"));
-                boolean lethal = (killed > 0);
-
-                context.write(new Text(newkey), new BooleanWritable(lethal));
-
-            } catch(NumberFormatException | ParseException e) {
+            } catch(NumberFormatException | ArrayIndexOutOfBoundsException e) {
                 LOG.warn(String.format("Row %s: %s", key.toString(), e.getMessage()));
             }
 
@@ -97,26 +80,29 @@ public class WeekBorough  extends Configured implements Tool {
     }
 
     /*
-        Returns tuples <Text "YEAR-WEEK-BOROUGH", Number of accidents, Number of lethal accidents>
+        Returns tuples <Text ContributingFactor, N. deaths per accident, N. accidents, Percentage of lethal accidents>
      */
-    public static class WeekBoroughReducer
-            extends Reducer<Text,BooleanWritable,Text,Text> {
+    public static class ContributingFactorReducer
+            extends Reducer<Text,IntWritable,Text,Text> {
+        private IntWritable result = new IntWritable();
 
         @Override
-        public void reduce(Text key, Iterable<BooleanWritable> values,
+        public void reduce(Text key, Iterable<IntWritable> values,
                            Context context
         ) throws IOException, InterruptedException {
-
-            int numLethalAccidents = 0;
+            int deaths = 0;
             int numAccidents = 0;
-            for (BooleanWritable val : values) {
+            int lethalAccidents = 0;
+            for (IntWritable currentDeaths : values) {
+                deaths += currentDeaths.get();
                 numAccidents++;
-                if (val.get()) {
-                    numLethalAccidents++;
-                }
+                if(currentDeaths.get()>0)
+                    lethalAccidents++;
             }
+            float avgDeaths = (float)deaths / numAccidents;
+            float avgLethal = (float)lethalAccidents / numAccidents;
 
-            String res = String.format("%d\t%d", numAccidents, numLethalAccidents);
+            String res = String.format("%.8f\t%d\t%f", avgDeaths, numAccidents, avgLethal);
             context.write(key, new Text(res));
         }
     }
@@ -128,20 +114,18 @@ public class WeekBorough  extends Configured implements Tool {
         GenericOptionsParser optionParser = new GenericOptionsParser(conf, args);
         String[] remainingArgs = optionParser.getRemainingArgs();
         if (remainingArgs.length != 2) {
-            System.err.println("Usage: WeekBorough <infile.csv> <out>");
+            System.err.println("Usage: ContributingFactors <infile.csv> <out>");
             System.exit(2);
         }
 
         Job job = Job.getInstance(conf, this.getClass().toString());
 
-        job.setJarByClass(WeekBorough.class);
-        job.setMapperClass(WeekBoroughMapper.class);
-        job.setReducerClass(WeekBoroughReducer.class);
+        job.setJarByClass(ContributingFactors.class);
+        job.setMapperClass(ContributingFactorMapper.class);
+        job.setReducerClass(ContributingFactorReducer.class);
 
-        job.setMapOutputKeyClass(Text.class);
-        job.setMapOutputValueClass(BooleanWritable.class);
         job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(Text.class);
+        job.setOutputValueClass(IntWritable.class);
 
         Path in = new Path(remainingArgs[0]);
         Path out = new Path(remainingArgs[1]);
@@ -154,7 +138,7 @@ public class WeekBorough  extends Configured implements Tool {
 
     public static void main(String[] args) throws Exception {
         // Let ToolRunner handle generic command-line options
-        int res = ToolRunner.run(new Configuration(), new WeekBorough(), args);
+        int res = ToolRunner.run(new Configuration(), new ContributingFactors(), args);
 
         System.exit(res);
     }

@@ -1,5 +1,3 @@
-package mw.hadoop.queries;
-
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.logging.Log;

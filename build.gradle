@@ -5,25 +5,128 @@ apply plugin: 'java'
 
 sourceCompatibility = 1.8
 
-repositories {
-    mavenCentral()
+project(':common') {
+    apply plugin: 'application'
+
+    mainClassName = ''
+
+    apply plugin: 'java'
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        compile 'org.apache.commons:commons-csv:1.4'
+    }
+
+    jar {
+        archiveName = "common.jar"
+
+        into('lib') {
+            from configurations.runtime
+        }
+
+        manifest {
+            attributes(
+                    "Implementation-Timestamp": new Date(),
+                    "Class-Path": configurations.compile.collect { it.getName() }.join(' '))
+        }
+    }
 }
 
-dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.11'
+project(':ContributingFactors') {
+    apply plugin: 'application'
 
-    compile group: 'org.apache.hadoop', name: 'hadoop-client', version: '2.7.3'
+    mainClassName = 'ContributingFactors'
 
-    compile 'org.apache.commons:commons-csv:1.4'
+    apply plugin: 'java'
 
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        compile project(':common')
+        compile group: 'org.apache.hadoop', name: 'hadoop-client', version: '2.7.3'
+    }
+
+    jar {
+        archiveName = "ContributingFactors.jar"
+
+        into('lib') {
+            from configurations.runtime
+        }
+
+        manifest {
+            attributes(
+                    "Implementation-Timestamp": new Date(),
+                    "Class-Path": configurations.compile.collect { it.getName() }.join(' '),
+                    'Main-Class' : 'ContributingFactors')
+        }
+    }
 }
 
-/*
-    Creates a "fat JAR" with all the right dependencies bundled into it.
-    This is needed to run the application with "hadoop jar ..."
- */
-jar {
-    into('lib') {
-        from configurations.runtime
+project(':LethalPerWeek') {
+    apply plugin: 'application'
+
+    mainClassName = 'LethalPerWeek'
+
+    apply plugin: 'java'
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        compile project(':common')
+        compile group: 'org.apache.hadoop', name: 'hadoop-client', version: '2.7.3'
+    }
+
+    jar {
+        archiveName = "LethalPerWeek.jar"
+
+        into('lib') {
+            from configurations.runtime
+        }
+
+        manifest {
+            attributes(
+                    "Implementation-Timestamp": new Date(),
+                    "Class-Path": configurations.compile.collect { it.getName() }.join(' '),
+                    'Main-Class' : 'LethalPerWeek')
+        }
+    }
+}
+
+project(':WeekBorough') {
+    apply plugin: 'application'
+
+    mainClassName = 'WeekBorough'
+
+    apply plugin: 'java'
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        compile project(':common')
+        compile group: 'org.apache.hadoop', name: 'hadoop-client', version: '2.7.3'
+    }
+
+    jar {
+        archiveName = "WeekBorough.jar"
+
+        into('lib') {
+            from configurations.runtime
+        }
+
+        manifest {
+            attributes(
+                    "Implementation-Timestamp": new Date(),
+                    "Class-Path": configurations.compile.collect { it.getName() }.join(' '),
+                    'Main-Class' : 'WeekBorough')
+        }
     }
 }

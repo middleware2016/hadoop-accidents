@@ -1,2 +1,6 @@
 rootProject.name = 'hadoop-accidents'
+include 'ContributingFactors'
+include 'WeekBorough'
+include 'LethalPerWeek'
+include 'common'
 

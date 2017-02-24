@@ -27,6 +27,6 @@ for example `./run.sh LethalPerWeek WeekBorough`.
 
 ## Manual way    
     # To run the queries on the cluster
-    hadoop jar build/libs/hadoop-accidents-1.0-SNAPSHOT.jar mw.hadoop.queries.ContributingFactors file:///path/to/NYPD_Motor_Vehicle_Collisions.csv file:///path/to/output1
-    hadoop jar build/libs/hadoop-accidents-1.0-SNAPSHOT.jar mw.hadoop.queries.LethalPerWeek file:///path/to/NYPD_Motor_Vehicle_Collisions.csv file:///path/to/output2
-    hadoop jar build/libs/hadoop-accidents-1.0-SNAPSHOT.jar mw.hadoop.queries.WeekBorough file:///path/to/NYPD_Motor_Vehicle_Collisions.csv file:///path/to/output3
+    hadoop jar build/libs/hadoop-accidents-1.0-SNAPSHOT.jar ContributingFactors file:///path/to/NYPD_Motor_Vehicle_Collisions.csv file:///path/to/output1
+    hadoop jar build/libs/hadoop-accidents-1.0-SNAPSHOT.jar LethalPerWeek file:///path/to/NYPD_Motor_Vehicle_Collisions.csv file:///path/to/output2
+    hadoop jar build/libs/hadoop-accidents-1.0-SNAPSHOT.jar WeekBorough file:///path/to/NYPD_Motor_Vehicle_Collisions.csv file:///path/to/output3
