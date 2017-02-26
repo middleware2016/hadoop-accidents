@@ -52,7 +52,7 @@ def plot():
             label="Cause", picker=True)
 
     ax.semilogx()
-    ax.set_ylim(ymin=-0.001)
+    ax.set_ylim(ymin=-0.001, ymax=0.013)
     plt.xlabel('Number of accidents')
     plt.ylabel('% of lethal accidents')
 
@@ -64,7 +64,7 @@ def plot():
     plt.grid(True)
 
     fig.canvas.mpl_connect('pick_event', picked)
-
+    plt.tight_layout()
     plt.show()
 
 try:
