@@ -32,7 +32,7 @@ import java.util.GregorianCalendar;
 public class LethalPerWeek extends Configured implements Tool {
 
     /*
-        Generate tuples <Text "YYYY-weeknum", 1> for lethal accidents per week
+        Generate tuples <Text "YYYY-weeknum", IntWritable 1> for each lethal accident
         weeknum is the number of the week in the year (1-52, approximately)
      */
     public static class LethalWeekMapper
@@ -41,7 +41,7 @@ public class LethalPerWeek extends Configured implements Tool {
         private final static Log LOG = LogFactory.getLog(LethalWeekMapper.class);
         private final static IntWritable one = new IntWritable(1);
 
-        //Data management utility
+        // Date management utility
         private SimpleDateFormat formatter;
         private Calendar cal;
 
@@ -74,7 +74,7 @@ public class LethalPerWeek extends Configured implements Tool {
 
             try {
                 String killedStr = record.get("NUMBER OF PERSONS KILLED");
-                //empty string became 0 killed
+                // Empty string: assuming 0 persons killed
                 if(killedStr.equals(""))
                     killedStr = "0";
 
@@ -84,6 +84,10 @@ public class LethalPerWeek extends Configured implements Tool {
                     String dateStr = record.get("DATE");
                     Date date = formatter.parse(dateStr);
                     cal.setTime(date);
+                    
+                    /* Using Calendar.getWeekYear() and not Calendar.getYear():
+                        the year must be consistent with the convention used for weeks.
+                        See Java documentation for Calendar for details. */
                     String newkey = String.format("%d-%02d", cal.getWeekYear(), cal.get(Calendar.WEEK_OF_YEAR));
 
                     context.write(new Text(newkey), one);
@@ -111,7 +115,7 @@ public class LethalPerWeek extends Configured implements Tool {
         job.setJarByClass(LethalPerWeek.class);
         job.setMapperClass(LethalWeekMapper.class);
 
-        // Built-in combiner/reducer by Hadoop, which simply sums the values for each key.
+        // Built-in combiner/reducer by Hadoop, which simply sums the integer values for each key.
         job.setCombinerClass(IntSumReducer.class);
         job.setReducerClass(IntSumReducer.class);
 

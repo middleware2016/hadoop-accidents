@@ -12,12 +12,12 @@ def processFile(file):
     with file as f:
         for i, row in enumerate(f):
             tmp = row.split("\t")
-            if( len(tmp) == 3):
+            if( len(tmp) == 4):
                 xlabels.append(tmp[0])
                 x.append(i)
                 x2.append(i+width)
-                y.append(float(tmp[1].replace(',', '.')))
-                y2.append(float(tmp[2].replace(',', '.')))
+                y.append(float(tmp[2].replace(',', '.')))
+                y2.append(float(tmp[1].replace(',', '.')))
 
 def plot():
     #X and Y are swapped

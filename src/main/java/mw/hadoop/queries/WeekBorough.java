@@ -27,7 +27,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 /*
-    Return the average number of accidents and average number of lethal accidents per week per borough.
+    Return the average number of accidents and average number of lethal accidents for each couple (Week, Borough).
     An "UNKNOWN" value is used when the borough field is empty.
  */
 public class WeekBorough  extends Configured implements Tool {
@@ -39,7 +39,7 @@ public class WeekBorough  extends Configured implements Tool {
 
         private static final Log LOG = LogFactory.getLog(WeekBoroughMapper.class);
 
-        //Data management utility
+        // Date management utility
         private SimpleDateFormat formatter;
         private Calendar cal;
 
@@ -50,13 +50,13 @@ public class WeekBorough  extends Configured implements Tool {
         }
 
         /*
-            Generates tuples <Text "YEAR-WEEK-BOROUGH", BooleanWritable is_lethal>
+            Generates a tuple <Text "YEAR-WEEK_BOROUGH", BooleanWritable is_lethal> for each accident.
          */
         @Override
         public void map(Object key, Text value, Context context
         ) throws IOException, InterruptedException {
 
-            //skip header
+            // Skip header row
             if(key.toString().equals("0"))
                 return;
 
@@ -82,6 +82,10 @@ public class WeekBorough  extends Configured implements Tool {
                     // Default value when the field is empty
                     borough = "UNKNOWN";
                 }
+
+                /* Using Calendar.getWeekYear() and not Calendar.getYear():
+                        the year must be consistent with the convention used for weeks.
+                        See Java documentation for Calendar for details. */
                 String newkey = String.format("%d-%02d_%s", cal.getWeekYear(), cal.get(Calendar.WEEK_OF_YEAR), borough);
 
                 int killed = Integer.parseInt(record.get("NUMBER OF PERSONS KILLED"));
@@ -92,12 +96,11 @@ public class WeekBorough  extends Configured implements Tool {
             } catch(NumberFormatException | ParseException e) {
                 LOG.warn(String.format("Row %s: %s", key.toString(), e.getMessage()));
             }
-
         }
     }
 
     /*
-        Returns tuples <Text "YEAR-WEEK-BOROUGH", Number of accidents, Number of lethal accidents>
+        Returns tuples <Text "YEAR-WEEK_BOROUGH", IntWritable N. accidents, IntWritable N. lethal accidents>
      */
     public static class WeekBoroughReducer
             extends Reducer<Text,BooleanWritable,Text,Text> {

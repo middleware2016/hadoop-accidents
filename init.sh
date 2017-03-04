@@ -24,14 +24,14 @@ if [ \$# -lt 1 ]; then
     usage
 fi
 
-rm -rf $CURRENT_PATH/data/output
-
 if [ \$1 == \"runAll\" ]; then
     for i in \"\${SCRIPTS[@]}\"; do
+         rm -rf "$CURRENT_PATH/data/output/\$i"
          hadoop jar build/libs/hadoop-accidents-1.0-SNAPSHOT.jar mw.hadoop.queries.\$i file:///$CURRENT_PATH/data/NYPD_Motor_Vehicle_Collisions.csv file:///$CURRENT_PATH/data/output/\$i
     done
 else
     for i in \$@; do
+         rm -rf "$CURRENT_PATH/data/output/\$i"
          hadoop jar build/libs/hadoop-accidents-1.0-SNAPSHOT.jar mw.hadoop.queries.\$i file:///$CURRENT_PATH/data/NYPD_Motor_Vehicle_Collisions.csv file:///$CURRENT_PATH/data/output/\$i
     done
 fi

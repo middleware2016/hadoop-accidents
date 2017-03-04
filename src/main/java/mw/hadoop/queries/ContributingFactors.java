@@ -25,6 +25,7 @@ import java.io.StringReader;
     For each "contributing factor" in car accidents (e.g. driver distraction), return:
     1) The total number of accidents
     2) Average number of deaths per accident
+    3) Percentage of lethal accidents
  */
 public class ContributingFactors extends Configured implements Tool {
 
@@ -33,6 +34,7 @@ public class ContributingFactors extends Configured implements Tool {
 
         private final static Log LOG = LogFactory.getLog(ContributingFactorMapper.class);
         private final static IntWritable one = new IntWritable(1);
+        private final static int NUM_CONTRIBUTING_FACTORS_FOR_ROW = 5;
 
         /*
             Generates tuples <Text ContributionFactor, IntWritable Deaths>
@@ -42,7 +44,7 @@ public class ContributingFactors extends Configured implements Tool {
         public void map(Object key, Text value, Context context
         ) throws IOException, InterruptedException {
 
-            //skip header
+            // Skip header row
             if(key.toString().equals("0"))
                 return;
 
@@ -64,7 +66,7 @@ public class ContributingFactors extends Configured implements Tool {
                 int deaths = Integer.parseInt(record.get("NUMBER OF PERSONS KILLED"));
 
                 // iterate over 5 contribution factors
-                for(int i = 1; i <= 5; i++) {
+                for(int i = 1; i <= NUM_CONTRIBUTING_FACTORS_FOR_ROW; i++) {
                     String contribFactor = record.get(String.format("CONTRIBUTING FACTOR VEHICLE %d", i));
                     if (contribFactor.length() == 0) {
                         LOG.info("Empty contributing factor.");
@@ -82,7 +84,12 @@ public class ContributingFactors extends Configured implements Tool {
     }
 
     /*
-        Returns tuples <Text ContributingFactor, N. deaths per accident, N. accidents, Percentage of lethal accidents>
+        Writes tuples <
+            Text ContributingFactor,
+            IntWritable N. deaths per accident,
+            IntWritable N. accidents,
+            Percentage of lethal accidents
+           >
      */
     public static class ContributingFactorReducer
             extends Reducer<Text,IntWritable,Text,Text> {
@@ -98,7 +105,7 @@ public class ContributingFactors extends Configured implements Tool {
             for (IntWritable currentDeaths : values) {
                 deaths += currentDeaths.get();
                 numAccidents++;
-                if(currentDeaths.get()>0)
+                if(currentDeaths.get() > 0)
                     lethalAccidents++;
             }
             float avgDeaths = (float)deaths / numAccidents;
